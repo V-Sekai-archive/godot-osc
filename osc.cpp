@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 void OscBuffer::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("_make_packet_binary", "bundles"), &OscBuffer::_make_packet_binary);
+	ClassDB::bind_method(D_METHOD("make_packet", "bundles"), &OscBuffer::make_packet);
 	ClassDB::bind_method(D_METHOD("_make_test_packet"), &OscBuffer::_make_test_packet);
 	ClassDB::bind_method(D_METHOD("handle_packet", "bytes"), &OscBuffer::handle_packet);
 }
@@ -124,7 +124,7 @@ TypedArray<OscBundle> OscBuffer::_make_test_packet() {
 	return bundles;
 }
 
-Vector<uint8_t> OscBuffer::_make_packet_binary(TypedArray<OscBundle> p_bundles) {
+Vector<uint8_t> OscBuffer::make_packet(TypedArray<OscBundle> p_bundles) {
 	buffer.fill(0);
 	OSCPP::Client::Packet packet(buffer.ptrw(), buffer.size());
 	for (int32_t bundle_i = 0; bundle_i < p_bundles.size(); bundle_i++) {
