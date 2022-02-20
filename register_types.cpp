@@ -33,7 +33,7 @@
 #include "osc.h"
 
 void register_osc_types() {
-	ClassDB::register_class<Osc>();
+	ClassDB::register_class<OscBuffer>();
 }
 
 void unregister_osc_types() {}
