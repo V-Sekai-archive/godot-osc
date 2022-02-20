@@ -90,7 +90,7 @@ TypedArray<OscBundle> OscBuffer::_make_test_packet() {
 	Ref<OscArgumentString> amp;
 	amp.instantiate();
 	amp->value = "amp";
-	Ref<OscArgumentInt32> amp_float;
+	Ref<OscArgumentFloat> amp_float;
 	amp_float.instantiate();
 	amp_float->value = 0.4f;
 	array->value.push_back(amp);
@@ -110,15 +110,17 @@ TypedArray<OscBundle> OscBuffer::_make_test_packet() {
 	int_1.instantiate();
 	int_1->value = 1;
 	message_2->properties.push_back(int_1);
-	Vector<Ref<OscMessage>> messages;
+	TypedArray<OscMessage> messages;
 	messages.push_back(message_0);
 	messages.push_back(message_1);
 	messages.push_back(message_2);
 	Ref<OscBundle> bundle;
 	bundle.instantiate();
-	bundle->time_code.instantiate();
-	bundle->time_code->value = 1234ULL;
-	bundle->arguments = messages;
+	Ref<OscTimeCode> time_code;
+	time_code.instantiate();
+	time_code->value = 1234ULL;
+	bundle->set_time_code(time_code);
+	bundle->set_osc_messages(messages);
 	TypedArray<OscBundle> bundles;
 	bundles.push_back(bundle);
 	return bundles;
@@ -133,27 +135,39 @@ Vector<uint8_t> OscBuffer::make_packet(TypedArray<OscBundle> p_bundles) {
 		if (osc_bundle.is_null()) {
 			continue;
 		}
-		packet = packet.openBundle(osc_bundle->time_code->value);
-		for (Ref<OscMessage> message : osc_bundle->arguments) {
+		if (osc_bundle->get_time_code().is_null()) {
+			continue;
+		}
+		packet = packet.openBundle(osc_bundle->get_time_code()->value);
+		for (int32_t message_i = 0; message_i < osc_bundle->get_osc_messages().size(); message_i++) {
+			Ref<OscMessage> message = osc_bundle->get_osc_messages()[message_i];
 			int32_t count = 0;
 			if (message.is_null()) {
 				continue;
 			}
-			for (Ref<OscArgument> arg : message->properties) {
-				count += _handle_arguments(arg, nullptr);
+			for (int32_t property_i = 0; property_i < message->properties.size(); property_i++) {
+				Ref<OscArgument> arg = message->properties[property_i];
+				if (arg.is_null()) {
+					continue;
+				}
+				for (int32_t message_i = 0; message_i < message->properties.size(); message_i++) {
+					Ref<OscArgument> arg = message->properties[message_i];
+					count += _handle_arguments(arg, nullptr);
+				}
+				if (!count) {
+					continue;
+				}
+				CharString cs = message->path.ascii();
+				if (!cs.length()) {
+					continue;
+				}
+				packet = packet.openMessage(cs.get_data(), count);
+				for (int32_t message_parse_i = 0; message_parse_i < message->properties.size(); message_parse_i++) {
+					Ref<OscArgument> message_arg = message->properties[message_parse_i];
+					_handle_arguments(message_arg, &packet);
+				}
+				packet = packet.closeMessage();
 			}
-			if (!count) {
-				continue;
-			}
-			CharString cs = message->path.ascii();
-			if (!cs.length()) {
-				continue;
-			}
-			packet = packet.openMessage(cs.get_data(), count);
-			for (Ref<OscArgument> arg : message->properties) {
-				_handle_arguments(arg, &packet);
-			}
-			packet = packet.closeMessage();
 		}
 		packet = packet.closeBundle();
 	}
@@ -186,7 +200,8 @@ int32_t OscBuffer::_handle_arguments(Ref<OscArgument> p_args, OSCPP::Client::Pac
 			*r_packet = r_packet->openArray();
 		}
 		int32_t count = 0;
-		for (Ref<OscArgument> arg : osc_array->value) {
+		for (int32_t array_i = 0; array_i < osc_array->value.size(); array_i++) {
+			Ref<OscArgument> arg = osc_array->value[array_i];
 			count += _handle_arguments(arg, r_packet);
 		}
 		if (r_packet) {

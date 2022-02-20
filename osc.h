@@ -52,21 +52,42 @@ class OscArgumentArray : public OscArgument {
 	GDCLASS(OscArgumentArray, OscArgument);
 
 public:
-	Vector<Ref<OscArgument>> value;
+	TypedArray<OscArgument> value;
 };
 class OscMessage : public OscType {
 	GDCLASS(OscMessage, OscType);
 
 public:
 	String path;
-	Vector<Ref<OscArgument>> properties;
+	TypedArray<OscArgument> properties;
 };
 class OscBundle : public OscType {
 	GDCLASS(OscBundle, OscType);
 
-public:
 	Ref<OscTimeCode> time_code;
-	Vector<Ref<OscMessage>> arguments;
+	TypedArray<OscMessage> arguments;
+
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("set_time_code", "time_code"), &OscBundle::set_time_code);
+		ClassDB::bind_method(D_METHOD("get_time_code"), &OscBundle::get_time_code);
+		ClassDB::bind_method(D_METHOD("set_osc_messages", "time_code"), &OscBundle::set_osc_messages);
+		ClassDB::bind_method(D_METHOD("get_osc_messages"), &OscBundle::get_osc_messages);
+	}
+
+public:
+	void set_time_code(Ref<OscTimeCode> p_time_code) {
+		time_code = p_time_code;
+	}
+	Ref<OscTimeCode> get_time_code() const {
+		return time_code;
+	}
+	void set_osc_messages(TypedArray<OscMessage> p_arguments) {
+		arguments = p_arguments;
+	}
+	TypedArray<OscMessage> get_osc_messages() const {
+		return arguments;
+	}
 };
 
 class OscBuffer : public Resource {
