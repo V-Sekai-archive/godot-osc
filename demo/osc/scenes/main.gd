@@ -1,4 +1,4 @@
 extends Node3D
 
 func _ready():
-	pass
+	var osc = Osc.new()
