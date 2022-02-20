@@ -30,7 +30,10 @@
 
 #include "register_types.h"
 
+#include "osc.h"
+
 void register_osc_types() {
+	ClassDB::register_class<Osc>();
 }
 
 void unregister_osc_types() {}
