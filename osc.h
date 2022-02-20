@@ -21,6 +21,12 @@ protected:
 	static void _bind_methods();
 
 public:
+
+/* Packet layout in `nomnoml` markup language
+ * [Byte buffer] -> [OSCPP::Client::Packet]
+ * [OSCPP::Client::Packet] -> [Bundle]
+ * [Bundle] -> [Message]
+ * [Message] -> [Arguments | string | int32 | float32 | array] */
 	Vector<uint8_t> make_packet();
 	void handle_packet(Vector<uint8_t> p_bytes);
 	Osc();
