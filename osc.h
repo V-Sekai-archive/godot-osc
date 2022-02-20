@@ -81,7 +81,7 @@ protected:
 public:
 	int32_t _handle_arguments(Ref<OscArgument> p_args, OSCPP::Client::Packet *r_packet = nullptr);
 	Vector<uint8_t> _make_packet_binary(TypedArray<OscBundle> p_bundles);
-	TypedArray<OscBundle> _make_packet();
+	TypedArray<OscBundle> _make_test_packet();
 	void handle_packet(Vector<uint8_t> p_bytes);
 	OscBuffer();
 };

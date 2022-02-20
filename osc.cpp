@@ -4,7 +4,7 @@
 
 void OscBuffer::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_make_packet_binary", "bundles"), &OscBuffer::_make_packet_binary);
-	ClassDB::bind_method(D_METHOD("_make_packet"), &OscBuffer::_make_packet);
+	ClassDB::bind_method(D_METHOD("_make_test_packet"), &OscBuffer::_make_test_packet);
 	ClassDB::bind_method(D_METHOD("handle_packet", "bytes"), &OscBuffer::handle_packet);
 }
 
@@ -49,7 +49,7 @@ OscBuffer::OscBuffer() {
 	buffer.resize(OSC_MAX_PACKET_SIZE);
 }
 
-TypedArray<OscBundle> OscBuffer::_make_packet() {
+TypedArray<OscBundle> OscBuffer::_make_test_packet() {
 	Ref<OscMessage> message_0;
 	message_0.instantiate();
 	message_0->path = "/s_new";
