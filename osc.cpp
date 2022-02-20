@@ -167,24 +167,24 @@ Vector<uint8_t> OscBuffer::make_packet(TypedArray<OscBundle> p_bundles) {
 				if (arg.is_null()) {
 					continue;
 				}
-				for (int32_t message_i = 0; message_i < message->get_properties().size(); message_i++) {
-					Ref<OscArgument> arg = message->get_properties()[message_i];
-					count += _handle_arguments(arg, nullptr);
-				}
-				if (!count) {
-					continue;
-				}
-				CharString cs = message->get_path().ascii();
-				if (!cs.length()) {
-					continue;
-				}
-				packet = packet.openMessage(cs.get_data(), count);
-				for (int32_t message_parse_i = 0; message_parse_i < message->get_properties().size(); message_parse_i++) {
-					Ref<OscArgument> message_arg = message->get_properties()[message_parse_i];
-					_handle_arguments(message_arg, &packet);
-				}
-				packet = packet.closeMessage();
+				count += _handle_arguments(arg, nullptr);
 			}
+			if (!count) {
+				continue;
+			}
+			CharString cs = message->get_path().ascii();
+			if (!cs.length()) {
+				continue;
+			}
+			packet = packet.openMessage(cs.get_data(), count);
+			for (int32_t property_i = 0; property_i < message->get_properties().size(); property_i++) {
+				Ref<OscArgument> arg = message->get_properties()[property_i];
+				if (arg.is_null()) {
+					continue;
+				}
+				_handle_arguments(arg, &packet);
+			}
+			packet = packet.closeMessage();
 		}
 		packet = packet.closeBundle();
 	}
