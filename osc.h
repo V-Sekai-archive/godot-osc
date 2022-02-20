@@ -26,6 +26,7 @@ protected:
 	static void _bind_methods() {
 		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscTimeCode::set_value);
 		ClassDB::bind_method(D_METHOD("get_value"), &OscTimeCode::get_value);
+		ADD_PROPERTY(PropertyInfo(Variant::INT, "value"), "set_value", "get_value");
 	}
 
 public:
@@ -48,6 +49,7 @@ protected:
 	static void _bind_methods() {
 		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentInt32::set_value);
 		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentInt32::get_value);
+		ADD_PROPERTY(PropertyInfo(Variant::INT, "value"), "set_value", "get_value");
 	}
 
 public:
@@ -67,6 +69,7 @@ protected:
 	static void _bind_methods() {
 		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentFloat::set_value);
 		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentFloat::get_value);
+		ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "value"), "set_value", "get_value");
 	}
 
 public:
@@ -85,6 +88,7 @@ protected:
 	static void _bind_methods() {
 		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentString::set_value);
 		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentString::get_value);
+		ADD_PROPERTY(PropertyInfo(Variant::STRING, "value"), "set_value", "get_value");
 	}
 
 public:
@@ -104,8 +108,11 @@ protected:
 	static void _bind_methods() {
 		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentArray::set_value);
 		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentArray::get_value);
+		ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "value", PROPERTY_HINT_ARRAY_TYPE,
+						 vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "OscArgument"),
+						 PROPERTY_USAGE_DEFAULT),
+			"set_value", "get_value");
 	}
-
 public:
 	void set_value(TypedArray<OscArgument> p_value) {
 		value = p_value;
@@ -126,6 +133,11 @@ protected:
 		ClassDB::bind_method(D_METHOD("get_path"), &OscMessage::get_path);
 		ClassDB::bind_method(D_METHOD("set_properties", "properties"), &OscMessage::set_properties);
 		ClassDB::bind_method(D_METHOD("get_properties"), &OscMessage::get_properties);
+		ADD_PROPERTY(PropertyInfo(Variant::STRING, "path"), "set_path", "get_path");
+		ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "properties", PROPERTY_HINT_ARRAY_TYPE,
+						 vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "OscArgument"),
+						 PROPERTY_USAGE_DEFAULT),
+			"set_properties", "get_properties");
 	}
 
 public:
@@ -152,8 +164,14 @@ protected:
 	static void _bind_methods() {
 		ClassDB::bind_method(D_METHOD("set_time_code", "time_code"), &OscBundle::set_time_code);
 		ClassDB::bind_method(D_METHOD("get_time_code"), &OscBundle::get_time_code);
-		ClassDB::bind_method(D_METHOD("set_osc_messages", "time_code"), &OscBundle::set_osc_messages);
+		ClassDB::bind_method(D_METHOD("set_osc_messages", "osc_messages"), &OscBundle::set_osc_messages);
 		ClassDB::bind_method(D_METHOD("get_osc_messages"), &OscBundle::get_osc_messages);
+		ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "time_code", PROPERTY_HINT_RESOURCE_TYPE, "time_code", PROPERTY_USAGE_DEFAULT),
+		"set_time_code", "get_time_code");
+		ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "osc_messages", PROPERTY_HINT_ARRAY_TYPE,
+						 vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "OscMessage"),
+						 PROPERTY_USAGE_DEFAULT),
+			"set_osc_messages", "get_osc_messages");
 	}
 
 public:
