@@ -21,11 +21,20 @@ public:
 class OscTimeCode : public OscType {
 	GDCLASS(OscTimeCode, OscType);
 
-public:
 	uint64_t value = 0;
-};
-class OscArgumentType : public OscType {
-	GDCLASS(OscArgumentType, OscType);
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscTimeCode::set_value);
+		ClassDB::bind_method(D_METHOD("get_value"), &OscTimeCode::get_value);
+	}
+
+public:
+	void set_value(uint64_t p_value) {
+		value = p_value;
+	}
+	uint64_t get_value() const {
+		return value;
+	}
 };
 class OscArgument : public OscType {
 	GDCLASS(OscArgument, OscType);
@@ -33,33 +42,105 @@ class OscArgument : public OscType {
 class OscArgumentInt32 : public OscArgument {
 	GDCLASS(OscArgumentInt32, OscArgument);
 
-public:
 	int32_t value = 0;
+
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentInt32::set_value);
+		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentInt32::get_value);
+	}
+
+public:
+	void set_value(int32_t p_value) {
+		value = p_value;
+	}
+	int32_t get_value() const {
+		return value;
+	}
 };
 class OscArgumentFloat : public OscArgument {
 	GDCLASS(OscArgumentFloat, OscArgument);
 
-public:
 	float_t value = 0.0f;
+
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentFloat::set_value);
+		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentFloat::get_value);
+	}
+
+public:
+	void set_value(float_t p_value) {
+		value = p_value;
+	}
+	float_t get_value() const {
+		return value;
+	}
 };
 class OscArgumentString : public OscArgument {
 	GDCLASS(OscArgumentString, OscArgument);
 
-public:
 	String value;
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentString::set_value);
+		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentString::get_value);
+	}
+
+public:
+	void set_value(String p_value) {
+		value = p_value;
+	}
+	String get_value() const {
+		return value;
+	}
 };
 class OscArgumentArray : public OscArgument {
 	GDCLASS(OscArgumentArray, OscArgument);
 
-public:
 	TypedArray<OscArgument> value;
+
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("set_value", "value"), &OscArgumentArray::set_value);
+		ClassDB::bind_method(D_METHOD("get_value"), &OscArgumentArray::get_value);
+	}
+
+public:
+	void set_value(TypedArray<OscArgument> p_value) {
+		value = p_value;
+	}
+	TypedArray<OscArgument> get_value() const {
+		return value;
+	}
 };
 class OscMessage : public OscType {
 	GDCLASS(OscMessage, OscType);
 
-public:
 	String path;
 	TypedArray<OscArgument> properties;
+
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("set_path", "path"), &OscMessage::set_path);
+		ClassDB::bind_method(D_METHOD("get_path"), &OscMessage::get_path);
+		ClassDB::bind_method(D_METHOD("set_properties", "properties"), &OscMessage::set_properties);
+		ClassDB::bind_method(D_METHOD("get_properties"), &OscMessage::get_properties);
+	}
+
+public:
+	void set_path(String p_path) {
+		path = p_path;
+	}
+	String get_path() const {
+		return path;
+	}
+	void set_properties(TypedArray<OscArgument> p_properties) {
+		properties = p_properties;
+	}
+	TypedArray<OscArgument> get_properties() const {
+		return properties;
+	}
 };
 class OscBundle : public OscType {
 	GDCLASS(OscBundle, OscType);
