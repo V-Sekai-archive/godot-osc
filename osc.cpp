@@ -81,5 +81,4 @@ Vector<uint8_t> Osc::make_packet() {
 
 Osc::Osc() {
 	buffer.resize(OSC_MAX_PACKET_SIZE);
-	handle_packet(make_packet());
 }
