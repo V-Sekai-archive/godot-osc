@@ -30,7 +30,7 @@
 
 #include "register_types.h"
 
-void register_speech_types() {
+void register_osc_types() {
 }
 
-void unregister_speech_types() {}
+void unregister_osc_types() {}

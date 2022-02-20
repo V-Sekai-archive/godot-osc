@@ -28,7 +28,5 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#pragma once
-
-void register_speech_types();
-void unregister_speech_types();
+void register_osc_types();
+void unregister_osc_types();
