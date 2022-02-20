@@ -165,24 +165,56 @@ Vector<uint8_t> OscBuffer::_make_packet_binary(TypedArray<OscBundle> p_bundles) 
 				continue;
 			}
 			for (Ref<OscArgument> arg : message->properties) {
+				count += _handle_arguments(arg, nullptr);
 			}
-			packet = packet.openMessage(message->path.ascii().get_data(), count);
+			if (!count) {
+				continue;
+			}
+			CharString cs = message->path.ascii();
+			if (!cs.length()) {
+				continue;
+			}
+			packet = packet.openMessage(cs.get_data(), count);
+			for (Ref<OscArgument> arg : message->properties) {
+				_handle_arguments(arg, &packet);
+			}
 			packet = packet.closeMessage();
 		}
 		packet = packet.closeBundle();
 	}
 	return buffer.slice(0, packet.size());
-	// // Add a message with two arguments and an array with 6 elements;
-	// // for efficiency this needs to be known in advance.
-	// .openMessage("/s_new", 2 + OSCPP::Tags::array(6))
-	// 		// Write the arguments
-	// 		.string("sinesweep")
-	// 		.int32(2)
-	// 		.openArray()
-	// 		.string("start-freq")
-	// 		.float32(330.0f)
-	// 		.string("end-freq")
-	// 		.float32(990.0f)
-	// 		.string("amp")
-	// 		.float32(0.4f) return buffer.slice(0, packet.size());
+}
+
+int32_t OscBuffer::_handle_arguments(Ref<OscArgument> p_args, OSCPP::Client::Packet *r_packet) {
+	Ref<OscArgumentInt32> osc_int = p_args;
+	Ref<OscArgumentFloat> osc_float_32 = p_args;
+	Ref<OscArgumentString> osc_string = p_args;
+	Ref<OscArgumentArray> osc_array = p_args;
+	if (osc_int.is_valid()) {
+		if (r_packet) {
+			*r_packet = r_packet->int32(osc_int->value);
+		}
+		return 1;
+	} else if (osc_float_32.is_valid()) {
+		if (r_packet) {
+			*r_packet = r_packet->int32(osc_float_32->value);
+		}
+		return 1;
+	} else if (osc_string.is_valid()) {
+		if (r_packet) {
+			CharString cs = osc_string->value.ascii();
+			*r_packet = r_packet->string(cs.get_data());
+		}
+		return 1;
+	} else if (osc_array.is_valid()) {
+		if (r_packet) {
+			*r_packet = r_packet->openArray();
+		}
+		int32_t count = _handle_arguments(p_args, r_packet);
+		if (r_packet) {
+			*r_packet = r_packet->closeArray();
+		}
+		return count;
+	}
+	return 0;
 }

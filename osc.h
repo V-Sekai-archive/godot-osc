@@ -79,6 +79,7 @@ protected:
 	static void _bind_methods();
 
 public:
+	int32_t _handle_arguments(Ref<OscArgument> p_args, OSCPP::Client::Packet *r_packet = nullptr);
 	Vector<uint8_t> _make_packet_binary(TypedArray<OscBundle> p_bundles);
 	TypedArray<OscBundle> _make_packet();
 	Vector<uint8_t> make_packet();
