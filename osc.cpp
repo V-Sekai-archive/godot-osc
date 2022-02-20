@@ -3,6 +3,8 @@
 #include <stdint.h>
 
 void OscBuffer::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("_make_packet_binary", "bundles"), &OscBuffer::_make_packet_binary);
+	ClassDB::bind_method(D_METHOD("_make_packet"), &OscBuffer::_make_packet);
 	ClassDB::bind_method(D_METHOD("handle_packet", "bytes"), &OscBuffer::handle_packet);
 	ClassDB::bind_method(D_METHOD("make_packet"), &OscBuffer::make_packet);
 }
@@ -85,7 +87,7 @@ OscBuffer::OscBuffer() {
 	buffer.resize(OSC_MAX_PACKET_SIZE);
 }
 
-Vector<Ref<OscBundle>> OscBuffer::_make_packet() {
+TypedArray<OscBundle> OscBuffer::_make_packet() {
 	// Ref<OscMessage> message_0;
 	// message_0.instantiate();
 	// message_0->path = "/s_new";
@@ -142,26 +144,30 @@ Vector<Ref<OscBundle>> OscBuffer::_make_packet() {
 	bundle->time_code.instantiate();
 	bundle->time_code->value = 1234ULL;
 	bundle->arguments = messages;
-	Vector<Ref<OscBundle>> bundles;
+	TypedArray<OscBundle> bundles;
 	bundles.push_back(bundle);
 	return bundles;
 }
 
-Vector<uint8_t> OscBuffer::_make_packet_binary(Vector<Ref<OscBundle>> p_bundles) {
+Vector<uint8_t> OscBuffer::_make_packet_binary(TypedArray<OscBundle> p_bundles) {
 	buffer.fill(0);
 	OSCPP::Client::Packet packet(buffer.ptrw(), buffer.size());
-	for (Ref<OscBundle> bundle : p_bundles) {
-		packet = packet.openBundle(bundle->time_code->value);
-		if (bundle.is_valid()) {
-			for (Ref<OscMessage> message : bundle->arguments) {
-				int32_t count = 0;
-				if (message.is_valid()) {
-					for (Ref<OscArgument> arg : message->properties) {
-					}
-				}
-				packet = packet.openMessage(message->path.ascii().get_data(), count);
-				packet = packet.closeMessage();
+	for (int32_t bundle_i = 0; bundle_i < p_bundles.size(); bundle_i++) {
+		Variant bundle = p_bundles[bundle_i];
+		Ref<OscBundle> osc_bundle = cast_to<OscBundle>(bundle);
+		if (osc_bundle.is_null()) {
+			continue;
+		}
+		packet = packet.openBundle(osc_bundle->time_code->value);
+		for (Ref<OscMessage> message : osc_bundle->arguments) {
+			int32_t count = 0;
+			if (message.is_null()) {
+				continue;
 			}
+			for (Ref<OscArgument> arg : message->properties) {
+			}
+			packet = packet.openMessage(message->path.ascii().get_data(), count);
+			packet = packet.closeMessage();
 		}
 		packet = packet.closeBundle();
 	}

@@ -4,6 +4,7 @@
 #include "core/io/resource.h"
 #include "core/object/ref_counted.h"
 #include "core/string/ustring.h"
+#include "core/variant/typed_array.h"
 
 #include <stdint.h>
 #include <iostream>
@@ -12,6 +13,7 @@
 
 class OscType : public RefCounted {
 	GDCLASS(OscType, RefCounted);
+
 public:
 	OscType() {}
 	~OscType() {}
@@ -77,8 +79,8 @@ protected:
 	static void _bind_methods();
 
 public:
-	Vector<uint8_t> _make_packet_binary(Vector<Ref<OscBundle>> p_bundles);
-	Vector<Ref<OscBundle>> _make_packet();
+	Vector<uint8_t> _make_packet_binary(TypedArray<OscBundle> p_bundles);
+	TypedArray<OscBundle> _make_packet();
 	Vector<uint8_t> make_packet();
 	void handle_packet(Vector<uint8_t> p_bytes);
 	OscBuffer();

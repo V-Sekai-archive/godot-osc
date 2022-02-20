@@ -30,9 +30,20 @@
 
 #include "register_types.h"
 
+#include "core/object/class_db.h"
+
 #include "osc.h"
 
 void register_osc_types() {
+	ClassDB::register_virtual_class<OscType>();
+	ClassDB::register_class<OscTimeCode>();
+	ClassDB::register_class<OscArgumentType>();
+	ClassDB::register_class<OscArgument>();
+	ClassDB::register_class<OscArgumentInt32>();
+	ClassDB::register_class<OscArgumentString>();
+	ClassDB::register_class<OscArgumentArray>();
+	ClassDB::register_class<OscMessage>();
+	ClassDB::register_class<OscBundle>();
 	ClassDB::register_class<OscBuffer>();
 }
 
