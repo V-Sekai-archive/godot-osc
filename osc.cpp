@@ -6,7 +6,6 @@ void OscBuffer::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_make_packet_binary", "bundles"), &OscBuffer::_make_packet_binary);
 	ClassDB::bind_method(D_METHOD("_make_packet"), &OscBuffer::_make_packet);
 	ClassDB::bind_method(D_METHOD("handle_packet", "bytes"), &OscBuffer::handle_packet);
-	ClassDB::bind_method(D_METHOD("make_packet"), &OscBuffer::make_packet);
 }
 
 void OscBuffer::handle_packet(Vector<uint8_t> p_bytes) {
@@ -46,80 +45,56 @@ void OscBuffer::_handle_packet(OSCPP::Server::Packet p_packet) {
 	}
 }
 
-Vector<uint8_t> OscBuffer::make_packet() {
-	buffer.fill(0);
-	OSCPP::Client::Packet packet(buffer.ptrw(), buffer.size());
-	// Open a bundle with a timetag
-	packet.openBundle(1234ULL)
-			// Add a message with two arguments and an array with 6 elements;
-			// for efficiency this needs to be known in advance.
-			.openMessage("/s_new", 2 + OSCPP::Tags::array(6))
-			// Write the arguments
-			.string("sinesweep")
-			.int32(2)
-			.openArray()
-			.string("start-freq")
-			.float32(330.0f)
-			.string("end-freq")
-			.float32(990.0f)
-			.string("amp")
-			.float32(0.4f)
-			.closeArray()
-			// Every `open` needs a corresponding `close`
-			.closeMessage()
-			// Add another message with one argument
-			.openMessage("/n_free", 1)
-			.int32(1)
-			.closeMessage()
-			// And nother one
-			.openMessage("/n_set", 3)
-			.int32(1)
-			.string("wobble")
-			// Numeric arguments are converted automatically
-			// (see below)
-			.int32(31)
-			.closeMessage()
-			.closeBundle();
-	return buffer.slice(0, packet.size());
-}
-
 OscBuffer::OscBuffer() {
 	buffer.resize(OSC_MAX_PACKET_SIZE);
 }
 
 TypedArray<OscBundle> OscBuffer::_make_packet() {
-	// Ref<OscMessage> message_0;
-	// message_0.instantiate();
-	// message_0->path = "/s_new";
-	// OscArgumentString sine_sweep;
-	// sine_sweep->value = "sinesweep";
-	// OscArgumentInt32 sine_sweep_count;
-	// sine_sweep_count.value = 2;
-	// message_0->properties.push_back(sine_sweep);
-	// message_0->properties.push_back(sine_sweep_count);
-	// OscArgumentString start_freq;
-	// start_freq.value = "start-freq";
-	// OscArgumentInt32 start_freq_float;
-	// start_freq_float.value = 330.0f;
-	// Ref<OscArgumentArray> array;
-	// array.push_back(start_freq);
-	// array.push_back(start_freq_float);
-	// message_0.properties.push_back(array);
-	// OscMessage message_1;
-	// message_1.path = "/n_free";
-	// message_1.properties.push_back(OscArgumentInt32{ 1 });
-	// OscArgumentInt32 end_freq;
-	// end_freq.value = "end-freq";
-	// OscArgumentInt32 end_freq_float;
-	// end_freq_float.value = 990.0f;
-	// array.push_back(end_freq);
-	// array.push_back(end_freq_float);
-	// OscArgumentInt32 amp;
-	// amp.value = "amp";
-	// OscArgumentInt32 amp_float;
-	// amp_float.value = 0.4f;
-	// array.push_back(amp);
-	// array.push_back(amp_float);
+	Ref<OscMessage> message_0;
+	message_0.instantiate();
+	message_0->path = "/s_new";
+	Ref<OscArgumentString> sine_sweep;
+	sine_sweep.instantiate();
+	sine_sweep->value = "sinesweep";
+	Ref<OscArgumentInt32> sine_sweep_count;
+	sine_sweep_count.instantiate();
+	sine_sweep_count->value = 2;
+	message_0->properties.push_back(sine_sweep);
+	message_0->properties.push_back(sine_sweep_count);
+	Ref<OscArgumentString> start_freq;
+	start_freq.instantiate();
+	start_freq->value = "start-freq";
+	Ref<OscArgumentFloat> start_freq_float;
+	start_freq_float.instantiate();
+	start_freq_float->value = 330.0f;
+	Ref<OscArgumentArray> array;
+	array.instantiate();
+	array->value.push_back(start_freq);
+	array->value.push_back(start_freq_float);
+	message_0->properties.push_back(array);
+	Ref<OscMessage> message_1;
+	message_1.instantiate();
+	message_1->path = "/n_free";
+	Ref<OscArgumentInt32> int_32;
+	int_32.instantiate();
+	int_32->value = 1;
+	message_1->properties.push_back(int_32);
+	Ref<OscArgumentString> end_freq;
+	end_freq.instantiate();
+	end_freq->value = "end-freq";
+	Ref<OscArgumentFloat> end_freq_float;
+	end_freq_float.instantiate();
+	end_freq_float->value = 990.0f;
+	array->value.push_back(end_freq);
+	array->value.push_back(end_freq_float);
+	Ref<OscArgumentString> amp;
+	amp.instantiate();
+	amp->value = "amp";
+	Ref<OscArgumentInt32> amp_float;
+	amp_float.instantiate();
+	amp_float->value = 0.4f;
+	array->value.push_back(amp);
+	array->value.push_back(amp_float);
 	Ref<OscMessage> message_2;
 	message_2.instantiate();
 	message_2->path = "/n_set";
@@ -136,8 +111,8 @@ TypedArray<OscBundle> OscBuffer::_make_packet() {
 	int_1->value = 1;
 	message_2->properties.push_back(int_1);
 	Vector<Ref<OscMessage>> messages;
-	// messages.push_back(message_0);
-	// messages.push_back(message_1);
+	messages.push_back(message_0);
+	messages.push_back(message_1);
 	messages.push_back(message_2);
 	Ref<OscBundle> bundle;
 	bundle.instantiate();
@@ -210,11 +185,14 @@ int32_t OscBuffer::_handle_arguments(Ref<OscArgument> p_args, OSCPP::Client::Pac
 		if (r_packet) {
 			*r_packet = r_packet->openArray();
 		}
-		int32_t count = _handle_arguments(p_args, r_packet);
+		int32_t count = 0;
+		for (Ref<OscArgument> arg : osc_array->value) {
+			count += _handle_arguments(arg, r_packet);
+		}
 		if (r_packet) {
 			*r_packet = r_packet->closeArray();
 		}
-		return count;
+		return OSCPP::Tags::array(count);
 	}
 	return 0;
 }
