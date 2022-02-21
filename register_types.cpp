@@ -39,6 +39,7 @@ void register_osc_types() {
 	ClassDB::register_class<OscTimeCode>();
 	ClassDB::register_class<OscArgument>();
 	ClassDB::register_class<OscArgumentInt32>();
+	ClassDB::register_class<OscArgumentFloat>();
 	ClassDB::register_class<OscArgumentString>();
 	ClassDB::register_class<OscArgumentArray>();
 	ClassDB::register_class<OscMessage>();

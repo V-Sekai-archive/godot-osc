@@ -179,10 +179,17 @@ Vector<uint8_t> OscBuffer::make_packet(TypedArray<OscBundle> p_bundles) {
 			packet = packet.openMessage(cs.get_data(), count);
 			for (int32_t property_i = 0; property_i < message->get_properties().size(); property_i++) {
 				Ref<OscArgument> arg = message->get_properties()[property_i];
+				Ref<OscArgumentArray> array_arg = message->get_properties()[property_i];
 				if (arg.is_null()) {
 					continue;
 				}
+				if (array_arg.is_valid()) {
+					packet = packet.openArray();
+				}
 				_handle_arguments(arg, &packet);
+				if (array_arg.is_valid()) {
+					packet = packet.closeArray();
+				}
 			}
 			packet = packet.closeMessage();
 		}
@@ -213,16 +220,10 @@ int32_t OscBuffer::_handle_arguments(Ref<OscArgument> p_args, OSCPP::Client::Pac
 		}
 		return 1;
 	} else if (osc_array.is_valid()) {
-		if (r_packet) {
-			*r_packet = r_packet->openArray();
-		}
 		int32_t count = 0;
 		for (int32_t array_i = 0; array_i < osc_array->get_value().size(); array_i++) {
 			Ref<OscArgument> arg = osc_array->get_value()[array_i];
 			count += _handle_arguments(arg, r_packet);
-		}
-		if (r_packet) {
-			*r_packet = r_packet->closeArray();
 		}
 		return OSCPP::Tags::array(count);
 	}
