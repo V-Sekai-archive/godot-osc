@@ -178,16 +178,19 @@ Vector<uint8_t> OscBuffer::make_packet(TypedArray<OscBundle> p_bundles) {
 			}
 			packet = packet.openMessage(cs.get_data(), count);
 			for (int32_t property_i = 0; property_i < message->get_properties().size(); property_i++) {
-				Ref<OscArgument> arg = message->get_properties()[property_i];
 				Ref<OscArgumentArray> array_arg = message->get_properties()[property_i];
+				Ref<OscArgument> arg = message->get_properties()[property_i];
 				if (arg.is_null()) {
 					continue;
 				}
-				if (array_arg.is_valid()) {
+				if (array_arg.is_null()) {
+					_handle_arguments(arg, &packet);
+				} else {
 					packet = packet.openArray();
-				}
-				_handle_arguments(arg, &packet);
-				if (array_arg.is_valid()) {
+					for (int32_t value_i = 0; value_i < array_arg->get_value().size(); value_i++) {
+						Ref<OscArgument> value_arg = array_arg->get_value()[value_i];
+						_handle_arguments(value_arg, &packet);
+					}
 					packet = packet.closeArray();
 				}
 			}
@@ -210,7 +213,7 @@ int32_t OscBuffer::_handle_arguments(Ref<OscArgument> p_args, OSCPP::Client::Pac
 		return 1;
 	} else if (osc_float_32.is_valid()) {
 		if (r_packet) {
-			*r_packet = r_packet->int32(osc_float_32->get_value());
+			*r_packet = r_packet->float32(osc_float_32->get_value());
 		}
 		return 1;
 	} else if (osc_string.is_valid()) {

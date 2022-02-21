@@ -51,7 +51,7 @@ func make_packet():
 	var osc_string_bobble : OscArgumentString  = OscArgumentString.new()
 	osc_string_bobble.value = "bobble";
 	osc_array.value.push_back(osc_string_bobble)
-	osc_array.value.push_back(int_1)
+	osc_array.value.push_back(int_1)	
 	message.properties.push_back(osc_array);
 	var time_code : OscTimeCode = OscTimeCode.new()
 	time_code.value = 1234;
@@ -70,7 +70,6 @@ func make_packet():
 					print("osc array")
 					for a in p.value:
 						print("osc value %s" % a.value)
-					
 	var osc_buffer : PackedByteArray = osc.make_packet(osc_packet)
 	print("osc buffer %s" % osc_buffer)
 	osc.handle_packet(osc_buffer)
